@@ -1,47 +1,56 @@
 package main
 
 import (
-	"math/rand"
+	"image/color"
+	"math"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 )
 
 func main() {
-	rand.Seed(int64(0))
-
 	p := plot.New()
 
-	p.Title.Text = "Plotutil example"
+	p.Title.Text = "Functions"
 	p.X.Label.Text = "X"
 	p.Y.Label.Text = "Y"
 
-	err := plotutil.AddLinePoints(p,
-		"First", randomPoints(15),
-		"Second", randomPoints(15),
-		"Third", randomPoints(15))
-	if err != nil {
-		panic(err)
-	}
+	// A quadratic function x^2
+	quad := plotter.NewFunction(func(x float64) float64 { return x * x })
+	quad.Color = color.RGBA{B: 255, A: 255}
+
+	// An exponential function 2^x
+	exp := plotter.NewFunction(func(x float64) float64 { return math.Pow(2, x) })
+	exp.Dashes = []vg.Length{vg.Points(2), vg.Points(2)}
+	exp.Width = vg.Points(2)
+	exp.Color = color.RGBA{G: 255, A: 255}
+
+	// The sine function, shifted and scaled
+	// to be nicely visible on the plot.
+	sin := plotter.NewFunction(func(x float64) float64 { return 10*math.Sin(x) + 50 })
+	sin.Dashes = []vg.Length{vg.Points(4), vg.Points(5)}
+	sin.Width = vg.Points(4)
+	sin.Color = color.RGBA{R: 255, A: 255}
+
+	// Add the functions and their legend entries.
+	p.Add(quad, exp, sin)
+	p.Legend.Add("x^2", quad)
+	p.Legend.Add("2^x", exp)
+	p.Legend.Add("10*sin(x)+50", sin)
+	p.Legend.ThumbnailWidth = 0.5 * vg.Inch
+
+	// Set the axis ranges.  Unlike other data sets,
+	// functions don't set the axis ranges automatically
+	// since functions don't necessarily have a
+	// finite range of x and y values.
+	p.X.Min = 0
+	p.X.Max = 10
+	p.Y.Min = 0
+	p.Y.Max = 100
 
 	// Save the plot to a PNG file.
-	if err := p.Save(4*vg.Inch, 4*vg.Inch, "points.png"); err != nil {
+	if err := p.Save(4*vg.Inch, 4*vg.Inch, "functions.png"); err != nil {
 		panic(err)
 	}
-}
-
-// randomPoints returns some random x, y points.
-func randomPoints(n int) plotter.XYs {
-	pts := make(plotter.XYs, n)
-	for i := range pts {
-		if i == 0 {
-			pts[i].X = rand.Float64()
-		} else {
-			pts[i].X = pts[i-1].X + rand.Float64()
-		}
-		pts[i].Y = pts[i].X + 10*rand.Float64()
-	}
-	return pts
 }

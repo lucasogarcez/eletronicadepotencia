@@ -9,48 +9,50 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
+/* Lógica proposta pelo professor
+if (math.Sin(x) > 0) {
+	if (math.Sin(x) > triang) {
+		saida1, saida4 = 1, 1
+	} else {
+		saida1, saida4 = 0, 0
+	}
+}
+else (math.Sin(x) < 0) {
+	if (math.Sin(x) < triang) {
+		saida2, saida3 = 1, 1
+	} else {
+		saida2, saida3 = 0, 0
+	}
+}
+*/
+
 func main() {
 	p := plot.New()
 
-	p.Title.Text = "Functions"
-	p.X.Label.Text = "X"
-	p.Y.Label.Text = "Y"
+	p.Title.Text = "Tensão de Entrada"
+	p.X.Label.Text = "rad"
+	p.Y.Label.Text = "V"
 
-	// A quadratic function x^2
-	quad := plotter.NewFunction(func(x float64) float64 { return x * x })
-	quad.Color = color.RGBA{B: 255, A: 255}
+	axis := plotter.NewFunction(func(x float64) float64 { return 0.0 })
+	axis.LineStyle = plotter.DefaultLineStyle
+	axis.Color = color.RGBA{R: 0, G: 0, B: 0, A: 255}
 
-	// An exponential function 2^x
-	exp := plotter.NewFunction(func(x float64) float64 { return math.Pow(2, x) })
-	exp.Dashes = []vg.Length{vg.Points(2), vg.Points(2)}
-	exp.Width = vg.Points(2)
-	exp.Color = color.RGBA{G: 255, A: 255}
-
-	// The sine function, shifted and scaled
-	// to be nicely visible on the plot.
-	sin := plotter.NewFunction(func(x float64) float64 { return 10*math.Sin(x) + 50 })
-	sin.Dashes = []vg.Length{vg.Points(4), vg.Points(5)}
-	sin.Width = vg.Points(4)
+	sin := plotter.NewFunction(func(x float64) float64 { return 50 * math.Sin(x) })
+	sin.LineStyle = plotter.DefaultLineStyle
 	sin.Color = color.RGBA{R: 255, A: 255}
 
-	// Add the functions and their legend entries.
-	p.Add(quad, exp, sin)
-	p.Legend.Add("x^2", quad)
-	p.Legend.Add("2^x", exp)
-	p.Legend.Add("10*sin(x)+50", sin)
+	p.Add(axis, sin)
+	p.Legend.Add("Vin", sin)
 	p.Legend.ThumbnailWidth = 0.5 * vg.Inch
 
-	// Set the axis ranges.  Unlike other data sets,
-	// functions don't set the axis ranges automatically
-	// since functions don't necessarily have a
-	// finite range of x and y values.
 	p.X.Min = 0
 	p.X.Max = 10
-	p.Y.Min = 0
+
+	p.Y.Min = -100
 	p.Y.Max = 100
 
 	// Save the plot to a PNG file.
-	if err := p.Save(4*vg.Inch, 4*vg.Inch, "functions.png"); err != nil {
+	if err := p.Save(4*vg.Inch, 4*vg.Inch, "resultado.png"); err != nil {
 		panic(err)
 	}
 }
